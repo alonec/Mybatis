@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 写Sql语句   -->
+<!-- namespace：命名空间，用于隔离sql，还有一个很重要的作用，
+Mapper动态代理开发的时候使用，需要指定Mapper的类路径 -->
+<mapper namespace="com.baidu.mybatis.mapper_proxy.OrderMap">
+    <!--查询所有订单 : resultMap手动映射.因为自动映射的话，user_id为NULL,映射不上-->
+    <!-- resultMap最终还是要将结果映射到pojo上，type就是指定映射到哪一个pojo -->
+    <!-- id：设置ResultMap的id ,在sql语句头部resultMap引用 -->
+    <resultMap id="OrderResultMap" type="Orders">
+        <!-- 定义主键 ,非常重要。如果是多个字段,则定义多个id -->
+        <!-- property：主键在pojo中的属性名 -->
+        <!-- column：主键在数据库中的列名 -->
+        <!--<id property="id" column="id"/>-->
+
+        <!--普通属性-->
+        <result property="userId" column="user_id"/>
+        <!--<result property="number" column="number"/>
+        <result property="createtime" column="createtime"/>
+        <result property="note" column="note"/>-->
+
+    </resultMap>
+    <!-- 定义主键 ,非常重要。如果是多个字段,则定义多个id -->
+    <!-- property：主键在pojo中的属性名 -->
+    <!-- column：主键在数据库中的列名 -->
+    <select id="queryOrderAll" resultMap="OrderResultMap">
+        SELECT id,user_id,number,createtime,note
+        from orders
+    </select>
+    <!--根据多个id查询用户信息 : 向sql传递数组或List，或包装数组，list，mybatis使用foreach解析-->
+    <select id="foreachTest" parameterType="list" resultType="Orders">
+        select * from orders
+        <where>
+            <!-- foreach标签，进行遍历 -->
+            <!-- collection：遍历的集合，这里是QueryVo的ids属性 -->
+            <!-- item：遍历的项目，可以随便写，，但是和后面的#{}里面要一致 -->
+            <!-- open：在前面添加的sql片段 -->
+            <!-- close：在结尾处添加的sql片段 -->
+            <!-- separator：指定遍历的元素之间使用的分隔符 -->
+            <foreach collection="list"  item="item" open=" id in (" close=" )" separator=" ,">
+                #{item}
+            </foreach>
+        </where>
+    </select>
+    <!-- 一对一关联：使用resultMap查询所有用户订单  -->
+    <resultMap id="oderUserResultMap" type="Orders">
+        <id column="id" property="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="number" property="number"/>
+        <result column="createtime" property="createtime"/>
+        <result column="note" property="note"/>
+        <!-- association ：配置一对一属性 -->
+        <!-- property:order里面的User属性名 -->
+        <!-- javaType:属性类型 -->
+        <association property="user" javaType="user">
+            <!-- id:声明主键，表示user_id是关联查询对象的唯一标识-->
+            <id column="id" property="id"/>
+            <result column="username" property="username"/>
+            <result column="address" property="address"/>
+        </association>
+     </resultMap>
+    <select id="queryOrderUserResultMap"  resultMap="oderUserResultMap">
+        SELECT
+        o.id,
+        o.user_id,
+        o.number,
+        o.createtime,
+        o.note,
+        u.username,
+        u.address
+        FROM
+        `orders` o
+        LEFT JOIN `user` u ON o.user_id = u.id
+    </select>
+
+    <!-- 一对多关联：使用resultMap查询所有用户信息及用户关联的订单信息。 -->
+    <resultMap id="userOrderResultMap" type="user">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="birthday" column="birthday"/>
+        <result property="sex" column="sex"/>
+        <result property="address" column="address"/>
+        <!--集合，一对多 要注意javaType="List" ofType="Orders" 元素类型-->
+        <collection property="orders"  ofType="Orders">
+            <id property="id" column="id"/>
+            <result property="number" column="number"/>
+            <result property="createtime" column="createtime"/>
+            <result property="note" column="note"/>
+        </collection>
+    </resultMap>
+    <select id="queryUserOrder" resultMap="userOrderResultMap" >
+        SELECT
+        u.id,
+        u.username,
+        u.birthday,
+        u.sex,
+        u.address,
+        o.id oid,
+        o.number,
+        o.createtime,
+        o.note
+        FROM
+        `user` u
+        LEFT JOIN `orders` o ON u.id = o.user_id
+    </select>
+</mapper>

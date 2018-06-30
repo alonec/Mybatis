@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 写Sql语句   -->
+<!--    <mapper namespace="test">  -->
+<mapper namespace="com.baidu.mybatis.mapper_proxy.UserMap">
+    <!-- 通过ID查询一个用户 (下面的resultType要写包名加类名，否则会报classnotfound异常，后面可能会起别名，来解决名字过长的问题) -->
+    <!--    这里resultType用了别名，因为在sqlMapConfig.xml文件中设置了    -->
+    <select id="findUserById" parameterType="integer" resultType="User">
+        select * from user where id = #{v}
+    </select>
+    <!--通过用户名模糊查询用户信息-->
+    <select id="findUserByUsername" parameterType="String" resultType="com.baidu.mybatis.pojo.User">
+        select * from user where username like '%${value}%'
+        <!--上述可以替换为：select * from user where username like "%"#{任意字符}"%"
+        select * from user where id = #{v}  表示占位符  ？== ‘ ’
+        select * from user where username like '%${value}%'  表示字符串拼接   {}里面必须填value
+        -->
+    </select>
+    <!--添加信息-->
+    <!--入参为User类型，parameterType自动映射，只要和pojo的属性一一对应，就可以自动映射,{}里面不需要写user.usermame等-->
+    <insert id="InserUser" parameterType="com.baidu.mybatis.pojo.User" >
+        insert into user (username,birthday,sex,address)
+        values (#{username},#{birthday},#{sex},#{address})
+    </insert>
+
+    <!--添加信息,并返回刚添加的用户ID-->
+    <insert id="InserUserAndReturnId" parameterType="com.baidu.mybatis.pojo.User" >
+        <!--Mysql 主键自增的，且是int类型，所以用after。如果是oracle，怎定用before-->
+        <selectKey keyProperty="id" resultType="integer" order="AFTER">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into user (username,birthday,sex,address)
+        values (#{username},#{birthday},#{sex},#{address})
+    </insert>
+
+</mapper>

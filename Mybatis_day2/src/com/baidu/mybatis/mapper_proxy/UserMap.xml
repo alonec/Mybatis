@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 写Sql语句   -->
+<mapper namespace="com.baidu.mybatis.mapper_proxy.UserMap">
+    <!--通过id查询用户信息 : 传递简单类型-->
+    <select id="findUserById" parameterType="integer" resultType="user">
+        SELECT *from user where id = #{id}
+    </select>
+    <!--通过id查询用户信息 : 传递简单类型-->
+    <insert id="insertUser" parameterType="User">
+        INSERT user (username,birthday,sex,address)
+        VALUES (#{username},#{birthday},#{sex},#{address})
+    </insert>
+    <!-- 通过用户名模糊查询：传递pojo包装对象 -->
+    <select id="findUserByUsername" parameterType="QueryVo" resultType="User">
+        SELECT *
+        from user
+        where username like "%${user.username}%"
+        <!-- 注意这里是user.username，因为传入的是QueryVo包装类，user是QueryVo的属性，
+        可以直接写，但是username却又是user的属性，所以 必须写成user.username-->
+    </select>
+    <!-- 输出用户表的数据条数：输出类型（integer） -->
+    <select id="queryUsercount" resultType="integer">
+        SELECT count(*) from user
+    </select>
+</mapper>
