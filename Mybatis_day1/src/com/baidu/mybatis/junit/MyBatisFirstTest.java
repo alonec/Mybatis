@@ -32,7 +32,7 @@ public class MyBatisFirstTest {
         SqlSession sqlSession = sqlSessionFactory.openSession();
 
         //执行Sql语句
-        User user = sqlSession.selectOne("test.findUserById", 10);
+        User user = sqlSession.selectOne("findUserById", 10);
 
         System.out.println(user);
         sqlSession.close();
@@ -55,7 +55,7 @@ public class MyBatisFirstTest {
         SqlSession sqlSession = sqlSessionFactory.openSession();
 
         //执行Sql语句
-        List<User> users = sqlSession.selectList("test.findUserByUsername", "五");
+        List<User> users = sqlSession.selectList("findUserByUsername", "五");
         for (User user2 : users) {
             System.out.println(user2);
         }
@@ -84,7 +84,7 @@ public class MyBatisFirstTest {
         user.setSex("1");
         user.setAddress("ane45678912");
 
-        int i = sqlSession.insert("test.InserUser", user);
+        int i = sqlSession.insert("InserUser", user);
         System.out.println(i);// 影响了几行
         // 提交事务。只有提交了事务，数据库中表才能更新
         sqlSession.commit();
@@ -112,7 +112,7 @@ public class MyBatisFirstTest {
         user.setSex("1");
         user.setAddress("bbb");
 
-        int i = sqlSession.insert("test.InserUserAndReturnId", user);
+        int i = sqlSession.insert("InserUserAndReturnId", user);
 
         // 提交事务。只有提交了事务，数据库中表才能更新
         sqlSession.commit();
