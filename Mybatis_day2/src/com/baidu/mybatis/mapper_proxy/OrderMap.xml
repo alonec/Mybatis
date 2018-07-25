@@ -83,7 +83,8 @@ Mapper动态代理开发的时候使用，需要指定Mapper的类路径 -->
         <result property="sex" column="sex"/>
         <result property="address" column="address"/>
         <!--集合，一对多 要注意javaType="List" ofType="Orders" 元素类型-->
-        <collection property="orders"  ofType="Orders">
+        <collection property="orders"  javaType="List" ofType="Orders">
+            <!-- 配置主键，是关联Order的唯一标识 -->
             <id property="id" column="id"/>
             <result property="number" column="number"/>
             <result property="createtime" column="createtime"/>
@@ -97,7 +98,7 @@ Mapper动态代理开发的时候使用，需要指定Mapper的类路径 -->
         u.birthday,
         u.sex,
         u.address,
-        o.id oid,
+        o.id ,
         o.number,
         o.createtime,
         o.note
